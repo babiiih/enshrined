@@ -7,7 +7,6 @@ import { ritualChain, RITUAL_EXPLORER } from "@/lib/ritual-chain";
 import { getActiveFactory } from "@/lib/deployments";
 import { prefetchPools, invalidatePoolsCache, type PoolRow } from "@/lib/prefetch";
 import { NetworkGuard } from "@/components/network-guard";
-import { AuthGuard } from "@/components/auth-guard";
 import { PoolsSkeleton } from "@/components/skeletons/pools-skeleton";
 
 export const Route = createFileRoute("/pools")({
@@ -22,11 +21,7 @@ export const Route = createFileRoute("/pools")({
       { property: "og:description", content: "Live AMM pools on Ritual chain 1979." },
     ],
   }),
-  component: () => (
-    <AuthGuard title="Ritual DEX Pools" skeleton={<PoolsSkeleton />}>
-      <PoolsPage />
-    </AuthGuard>
-  ),
+  component: PoolsPage,
 });
 
 function PoolsPage() {
