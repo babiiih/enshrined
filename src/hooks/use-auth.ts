@@ -1,35 +1,22 @@
-import { useEffect, useState } from "react";
-import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { usePrivy } from "@privy-io/react-auth";
 
 /**
- * Client-side auth state. Subscribes to Supabase's `onAuthStateChange`
- * synchronously first, then hydrates the initial session.
+ * Client-side auth state using Privy.
+ * Replaces the previous Supabase-based auth.
  */
 export function useAuth() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { ready, authenticated, user, logout } = usePrivy();
 
-  useEffect(() => {
-    // Register listener BEFORE fetching session — order matters.
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => sub.subscription.unsubscribe();
-  }, []);
-
-  return { session, user, loading, isAuthenticated: !!user };
+  return {
+    session: authenticated ? user : null,
+    user: user ?? null,
+    loading: !ready,
+    isAuthenticated: authenticated,
+    signOut: logout,
+  };
 }
 
 export async function signOut() {
-  await supabase.auth.signOut();
+  // This will be handled by the Privy provider
+  // The actual logout function is returned by useAuth
 }

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogOut, User as UserIcon, LogIn } from "lucide-react";
-import { useAuth, signOut } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function UserMenu() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
 
   if (loading) {
@@ -30,10 +30,10 @@ export function UserMenu() {
     );
   }
 
-  const email = user?.email ?? "";
-  const initials =
-    (user?.user_metadata?.display_name as string | undefined)?.slice(0, 2).toUpperCase() ||
-    email.slice(0, 2).toUpperCase();
+  // Get display info from Privy user
+  const email = user?.email?.address ?? "";
+  const displayName = user?.google?.name ?? user?.email?.address?.split("@")[0] ?? "User";
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   async function handleSignOut() {
     await signOut();
@@ -52,7 +52,7 @@ export function UserMenu() {
             {initials || <UserIcon className="size-3" />}
           </span>
           <span className="hidden sm:inline text-xs text-foreground max-w-[120px] truncate">
-            {email}
+            {displayName}
           </span>
         </button>
       </DropdownMenuTrigger>
@@ -61,7 +61,10 @@ export function UserMenu() {
           <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Signed in as
           </div>
-          <div className="text-xs text-foreground truncate">{email}</div>
+          <div className="text-xs text-foreground truncate">{displayName}</div>
+          {email && (
+            <div className="text-[11px] text-muted-foreground truncate">{email}</div>
+          )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
