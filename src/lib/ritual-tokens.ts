@@ -106,11 +106,9 @@ export type PairInfo = {
 };
 
 export const PAIRS: PairInfo[] = [
-  // Original pairs
   { token0: "USDR", token1: "AIR", address: "0xC432Eaf3f2dd5271F0dA6Ad11a53ae90410722cB" },
   { token0: "USDR", token1: "COMPUTE", address: "0x194AC8d266d76d22cD5F67348fFAAeAc3ba4CE78" },
   { token0: "AIR", token1: "COMPUTE", address: "0xd177D0a013260cb5b126b57D56af1bB15b938a7f" },
-  // New pairs
   { token0: "USDR", token1: "RMEME", address: "0xbec560dbe3a3fcfa5e7be9837a575140453df28b" },
   { token0: "USDR", token1: "AGENT", address: "0x40054b9539b50b8d165ffe4f2d38c44ccfe2752c" },
   { token0: "USDR", token1: "DEFI", address: "0xb6fc4ce79c3746f41ff4a1ca40e70f482d02eacd" },
@@ -125,3 +123,28 @@ export const PAIRS: PairInfo[] = [
 ];
 
 export const tokenBySymbol = (s: string) => TOKENS.find((t) => t.symbol === s)!;
+
+/**
+ * Mock swap quote — fallback for pairs without onchain liquidity.
+ * Real pairs use the AMM router directly.
+ */
+export function mockQuote(fromSym: string, toSym: string, amount: number) {
+  if (!amount || amount <= 0) return { out: 0, rate: 0, impact: 0, route: [fromSym, toSym] };
+
+  const RATES: Record<string, number> = {
+    RITUAL: 1,
+    USDR: 1,
+    AIR: 3.2,
+    COMPUTE: 12.5,
+    RMEME: 0.001,
+    AGENT: 5,
+    DEFI: 2.5,
+    NFTX: 0.8,
+  };
+  const fromUsd = RATES[fromSym] ?? 1;
+  const toUsd = RATES[toSym] ?? 1;
+  const rate = fromUsd / toUsd;
+  const impact = Math.min(0.08, Math.sqrt(amount) * 0.0035);
+  const out = amount * rate * (1 - impact);
+  return { out, rate, impact, route: [fromSym, toSym] };
+}
