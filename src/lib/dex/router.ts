@@ -33,8 +33,9 @@ export function applySlippageMin(amountOut: bigint, slippageBps: number): bigint
   return (amountOut * (10_000n - bps)) / 10_000n;
 }
 
-export function deadlineFromNow(seconds = 20 * 60): bigint {
-  return BigInt(Math.floor(Date.now() / 1000) + seconds);
+export function deadlineFromNow(ms = 20 * 60 * 1000): bigint {
+  // Ritual chain uses millisecond timestamps
+  return BigInt(Date.now() + ms);
 }
 
 export function sortTokens(a: `0x${string}`, b: `0x${string}`): [`0x${string}`, `0x${string}`] {

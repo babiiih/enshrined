@@ -96,8 +96,8 @@ export const TOKENS: RitualToken[] = [
   },
 ];
 
-export const ROUTER_ADDRESS = "0x89a1bc4F5F6563134D66259aA8326aBc4B4D6888" as const;
-export const FACTORY_ADDRESS = "0x8fa5d9717533286c1AF4b0e829b884B7eA581Cc6" as const;
+export const ROUTER_ADDRESS = "0xA1A36B9dd9877F580b51D407B023D08c66A937B6" as const;
+export const FACTORY_ADDRESS = "0x2C8b6652f2C48b8596F87a2f3e0e1449791aB39c" as const;
 
 export type PairInfo = {
   token0: string;
@@ -106,20 +106,20 @@ export type PairInfo = {
 };
 
 export const PAIRS: PairInfo[] = [
-  { token0: "USDR", token1: "AIR", address: "0xC432Eaf3f2dd5271F0dA6Ad11a53ae90410722cB" },
-  { token0: "USDR", token1: "COMPUTE", address: "0x194AC8d266d76d22cD5F67348fFAAeAc3ba4CE78" },
-  { token0: "AIR", token1: "COMPUTE", address: "0xd177D0a013260cb5b126b57D56af1bB15b938a7f" },
-  { token0: "USDR", token1: "RMEME", address: "0xbec560dbe3a3fcfa5e7be9837a575140453df28b" },
-  { token0: "USDR", token1: "AGENT", address: "0x40054b9539b50b8d165ffe4f2d38c44ccfe2752c" },
-  { token0: "USDR", token1: "DEFI", address: "0xb6fc4ce79c3746f41ff4a1ca40e70f482d02eacd" },
-  { token0: "USDR", token1: "NFTX", address: "0xc5daf106e765a97dc07175b9888dd5e9d40c57b3" },
-  { token0: "AIR", token1: "RMEME", address: "0xee137aab3fbe9bf9f34b8f8c3aec3a54c279019e" },
-  { token0: "AIR", token1: "AGENT", address: "0x71d981eef579b32dec51c950b25482aa66f67f5d" },
-  { token0: "AIR", token1: "DEFI", address: "0x60e07144b3af2bec652ac0eb7cf85aa8ff54b0a7" },
-  { token0: "COMPUTE", token1: "RMEME", address: "0x88dbd272394d12c590f95305d7d119e749f4eca9" },
-  { token0: "COMPUTE", token1: "AGENT", address: "0xcf5cec12d99475b3bc9dee24b05002eee5103970" },
-  { token0: "RMEME", token1: "AGENT", address: "0xf59d2deada90a0bfb00a400affd0a3810ce66ede" },
-  { token0: "DEFI", token1: "NFTX", address: "0x2459892cc898d06101f94f37b681251e2db66a4d" },
+  { token0: "USDR", token1: "AIR", address: "0xE43fdF32C4769d3508c3eb52FbB7d95E792CFC7A" },
+  { token0: "USDR", token1: "COMPUTE", address: "0x0F20fCBCdd55645580A00e335767dBFe37fe8e30" },
+  { token0: "USDR", token1: "RMEME", address: "0xeBDA49a6D77B566E142449D64d40996eF1123bD7" },
+  { token0: "USDR", token1: "AGENT", address: "0x5d972711974B41df42F62aC48E4364314539918a" },
+  { token0: "USDR", token1: "DEFI", address: "0x471f6359baB1Ee515F207b6C91e97B8f3e1AF795" },
+  { token0: "USDR", token1: "NFTX", address: "0x88C3197C58B799247A27455Bf112d1B1619c368B" },
+  { token0: "AIR", token1: "COMPUTE", address: "0xF0a4Adb09C9B67576e3A8971C7E687b70Af9bd31" },
+  { token0: "AIR", token1: "RMEME", address: "0x86BE1983E00082010B46522f699193dF27feE26C" },
+  { token0: "AIR", token1: "AGENT", address: "0xd2a5596044cF0eCFEf1a03F5CEA942F55d93ee8B" },
+  { token0: "AIR", token1: "DEFI", address: "0xBAd5431c349deccB63a5F64031c89eE8d7C8f5D6" },
+  { token0: "COMPUTE", token1: "RMEME", address: "0xBA5Bb82724f8F495AD6f870cC085a05708F22514" },
+  { token0: "COMPUTE", token1: "AGENT", address: "0x314F1CB8bb8Ae393B37163d9aab1E5C09873546e" },
+  { token0: "RMEME", token1: "AGENT", address: "0x60534f6B30CDA7584c40bf5944A3ead913EA2f97" },
+  { token0: "DEFI", token1: "NFTX", address: "0x936f92F13132DA0df8652C6A8FD529FCff470166" },
 ];
 
 export const tokenBySymbol = (s: string) => TOKENS.find((t) => t.symbol === s)!;
