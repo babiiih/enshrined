@@ -38,9 +38,13 @@ function createSupabaseAdminClient() {
       ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
       ...(!SUPABASE_SERVICE_ROLE_KEY ? ['SUPABASE_SERVICE_ROLE_KEY'] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    console.warn(`[Supabase Admin] Missing env vars: ${missing.join(', ')}. Admin features disabled.`);
+    // Return a mock client that won't crash
+    return new Proxy({} as any, {
+      get() {
+        return () => Promise.resolve({ data: null, error: { message: 'Supabase admin not configured' } });
+      },
+    }) as any;
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
