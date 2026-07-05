@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, type ReactNode } from "react";
+import { WagmiProvider } from "wagmi";
 import { buildWagmiConfig } from "@/lib/wagmi-config";
 import { WalletStack, ConfigMissingBanner } from "./wallet-stack";
 
@@ -29,10 +30,10 @@ function ConfigBootstrap({ children }: { children: ReactNode }) {
 
   if (!data || !data.privyAppId) {
     return (
-      <>
+      <WagmiProvider config={wagmiConfig}>
         {!data ? null : <ConfigMissingBanner />}
         {children}
-      </>
+      </WagmiProvider>
     );
   }
 
