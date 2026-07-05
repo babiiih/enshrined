@@ -27,7 +27,7 @@ import {
  */
 export function SwapCard() {
   const [from, setFrom] = useState<RitualToken>(tokenBySymbol("RITUAL"));
-  const [to, setTo] = useState<RitualToken>(tokenBySymbol("xRITUAL"));
+  const [to, setTo] = useState<RitualToken>(tokenBySymbol("AIR"));
   const [amount, setAmount] = useState("");
   const [slippageBps, setSlippageBps] = useState(50); // 0.5%
 

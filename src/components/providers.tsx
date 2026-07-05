@@ -1,6 +1,5 @@
-import { WagmiProvider } from "wagmi";
-import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { useMemo, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, type ReactNode } from "react";
 import { buildWagmiConfig } from "@/lib/wagmi-config";
 import { WalletStack, ConfigMissingBanner } from "./wallet-stack";
 
@@ -16,17 +15,7 @@ async function fetchWalletConfig(): Promise<WalletConfig> {
 }
 
 export function Providers({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
-      }),
-  );
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ConfigBootstrap>{children}</ConfigBootstrap>
-    </QueryClientProvider>
-  );
+  return <ConfigBootstrap>{children}</ConfigBootstrap>;
 }
 
 function ConfigBootstrap({ children }: { children: ReactNode }) {
@@ -38,14 +27,12 @@ function ConfigBootstrap({ children }: { children: ReactNode }) {
     retry: 1,
   });
 
-  // Always mount base WagmiProvider so useAccount works during SSR and while
-  // the (lazy) Privy chunk streams in. Privy layers on top when configured.
   if (!data || !data.privyAppId) {
     return (
-      <WagmiProvider config={wagmiConfig}>
+      <>
         {!data ? null : <ConfigMissingBanner />}
         {children}
-      </WagmiProvider>
+      </>
     );
   }
 

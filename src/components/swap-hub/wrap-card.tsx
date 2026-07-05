@@ -48,7 +48,7 @@ export function WrapCard() {
   const [amount, setAmount] = useState("");
 
   const rit = tokenBySymbol("RITUAL");
-  const writ = tokenBySymbol("wRITUAL");
+  const writ = tokenBySymbol("wRITUAL") ?? { symbol: "wRITUAL", name: "Wrapped RITUAL", address: "0x0000000000000000000000000000000000000000" as const, decimals: 18, color: "#f7c948", logo: "w", isReal: false };
   const from = dir === "wrap" ? rit : writ;
   const to = dir === "wrap" ? writ : rit;
   const isReal = !!wrapAddr;
