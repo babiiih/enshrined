@@ -154,10 +154,8 @@ export function SwapCard() {
   const swapTx = useRitualTx("Swap");
   const approveTx = useRitualTx("Approve token");
 
-  const needApprove =
-    isReal && realQuote && allowance !== undefined
-      ? (allowance as bigint) < realQuote.amountIn
-      : false;
+  // Direct pair swap uses transfer() — no approval needed
+  const needApprove = false;
 
   const flip = () => {
     setFrom(to);
@@ -185,23 +183,36 @@ export function SwapCard() {
   }
 
   async function onSwap() {
-    if (!isReal || !router || !realQuote || !fromErc20 || !toErc20) return;
-    await swapTx.send(async (wc) =>
-      (wc as unknown as { writeContract: (a: unknown) => Promise<`0x${string}`> }).writeContract({
-        address: router,
-        abi: RitualRouter.abi,
-        functionName: "swapExactTokensForTokens",
+    if (!isReal || !pair || !realQuote || !fromErc20 || !toErc20) return;
+    // Direct pair swap — bypass broken router
+    await swapTx.send(async (wc) => {
+      const acct = (wc as unknown as { account: { address: `0x${string}` } }).account;
+      // Transfer tokens to pair
+      await (wc as unknown as { writeContract: (a: unknown) => Promise<`0x${string}`> }).writeContract({
+        address: fromErc20,
+        abi: erc20Abi,
+        functionName: "transfer",
+        args: [pair, realQuote.amountIn],
+        chain: ritualChain,
+        account: acct.address,
+      });
+      // Swap from pair
+      const t0 = (await pub!.readContract({ address: pair, abi: RitualPair.abi, functionName: "token0" })) as `0x${string}`;
+      const inIs0 = fromErc20.toLowerCase() === t0.toLowerCase();
+      await (wc as unknown as { writeContract: (a: unknown) => Promise<`0x${string}`> }).writeContract({
+        address: pair,
+        abi: RitualPair.abi,
+        functionName: "swap",
         args: [
-          realQuote.amountIn,
-          realQuote.min,
-          [fromErc20, toErc20],
-          (wc as unknown as { account: { address: `0x${string}` } }).account.address,
-          deadlineFromNow(),
+          inIs0 ? 0n : realQuote.min,
+          inIs0 ? realQuote.min : 0n,
+          acct.address,
+          "0x" as `0x${string}`,
         ],
         chain: ritualChain,
-        account: (wc as unknown as { account: `0x${string}` }).account,
-      }),
-    );
+        account: acct.address,
+      });
+    });
     setAmount("");
     setRefresh((n) => n + 1);
   }
@@ -216,7 +227,7 @@ export function SwapCard() {
         <div className="flex items-center gap-2 rounded-md border border-signal/30 bg-signal/5 px-3 py-2 text-[11px] text-signal">
           <Zap className="size-3.5" />
           <span className="mono-tag text-signal">onchain</span>
-          <span className="text-muted-foreground">Live pair · router {router!.slice(0, 6)}…</span>
+          <span className="text-muted-foreground">Live pair · direct swap</span>
         </div>
       ) : (
         <div className="flex items-start gap-2 rounded-md border border-chart-4/30 bg-chart-4/5 px-3 py-2 text-[11px] text-chart-4">

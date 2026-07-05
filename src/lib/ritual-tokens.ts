@@ -120,6 +120,8 @@ export const PAIRS: PairInfo[] = [
   { token0: "COMPUTE", token1: "AGENT", address: "0xeA116010E2bfc5BA3dBd10D199ff2B8Ab320AbFa" },
   { token0: "RMEME", token1: "AGENT", address: "0xAdc035097a332E6Cd47c4210194dC34f742159A4" },
   { token0: "DEFI", token1: "NFTX", address: "0xbf70b4b02a3394A95c51A45842C1F7C0829AF099" },
+  { token0: "RITUAL", token1: "USDR", address: "0x2E4Bb2627F94709B44079b501FEd5AbE8ce29d96" },
+  { token0: "RITUAL", token1: "AIR", address: "0x31090737aDCA0826318fC5d79317B99A8b590e3C" },
 ];
 
 export const tokenBySymbol = (s: string) => TOKENS.find((t) => t.symbol === s)!;
