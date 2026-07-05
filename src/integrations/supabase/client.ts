@@ -38,9 +38,13 @@ function createSupabaseClient() {
       ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
       ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    console.warn(`[Supabase] Missing env vars: ${missing.join(', ')}. Supabase features disabled.`);
+    // Return a mock client that won't crash
+    return new Proxy({} as any, {
+      get() {
+        return () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } });
+      },
+    }) as any;
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
