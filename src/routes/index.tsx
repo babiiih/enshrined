@@ -17,8 +17,8 @@ import { LiveStatsBar } from "@/components/live-stats-bar";
 import { BentoCard } from "@/components/bento-card";
 import { RITUAL_FAUCET, RITUAL_EXPLORER } from "@/lib/ritual-chain";
 import { PRECOMPILES } from "@/data/precompiles";
-import ritualBanner from "@/assets/ritual-bg.png.asset.json";
-import ritualLogo from "@/assets/ritual-logo.png.asset.json";
+import ritualBanner from "@/assets/ritual-bg.png";
+import ritualLogo from "@/assets/ritual-logo.png";
 import mascotWave from "@/assets/mascot-wave.png";
 import mascotHeart from "@/assets/mascot-heart.png";
 import mascotPeek from "@/assets/mascot-peek.png";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     links: [
       // Preload the small LCP logo so the hero paints fast.
-      { rel: "preload", as: "image", href: ritualLogo.url, fetchPriority: "high" },
+      { rel: "preload", as: "image", href: ritualLogo, fetchPriority: "high" },
     ],
   }),
   component: Index,
@@ -92,7 +92,7 @@ function Index() {
             never blocks initial paint. Rendered as a real <img> so the browser
             can defer it, decode off-thread, and skip it entirely when offscreen. */}
         <img
-          src={ritualBanner.url}
+          src={ritualBanner}
           alt=""
           aria-hidden
           loading="lazy"
@@ -110,7 +110,7 @@ function Index() {
         />
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-28 text-center relative">
           <img
-            src={ritualLogo.url}
+            src={ritualLogo}
             alt="Ritual"
             width={96}
             height={96}

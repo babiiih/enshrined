@@ -26,7 +26,7 @@ import { Providers } from "@/components/providers";
 import { WalletButton } from "@/components/wallet-button";
 import { UserMenu } from "@/components/user-menu";
 import { Toaster } from "@/components/ui/sonner";
-import ritualLogo from "@/assets/ritual-logo.png.asset.json";
+import ritualLogo from "@/assets/ritual-logo.png";
 import mascotPeek from "@/assets/mascot-peek.png";
 import { startVitals } from "@/lib/vitals-client";
 import { usePrefetchAfterAuth } from "@/hooks/use-prefetch-after-auth";
@@ -168,7 +168,7 @@ function RootComponent() {
                 <Link to="/" className="flex items-center gap-2 group">
                   <span className="relative logo-halo grid place-items-center size-9 rounded-2xl bg-white border border-[color-mix(in_oklab,var(--gold)_45%,var(--border))] overflow-hidden shadow-sm">
                     <img
-                      src={ritualLogo.url}
+                      src={ritualLogo}
                       alt="Ritual"
                       width={24}
                       height={24}

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { NAV, NAV_GROUPS } from "@/data/nav";
 import { PRECOMPILES } from "@/data/precompiles";
-import ritualLogo from "@/assets/ritual-logo.png.asset.json";
+import ritualLogo from "@/assets/ritual-logo.png";
 import { CatMascot } from "./cat-mascot";
 
 export function AppSidebar() {
@@ -26,7 +26,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2 px-2 py-2">
           <img
-            src={ritualLogo.url}
+            src={ritualLogo}
             alt="Ritual"
             className="size-7 rounded-md object-contain bg-black p-0.5 transition-transform group-hover:rotate-6"
           />
