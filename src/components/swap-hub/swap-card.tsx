@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowDown, Info, Zap, TriangleAlert, Rocket } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAccount, usePublicClient, useReadContract } from "wagmi";
-import { erc20Abi, formatUnits, parseUnits } from "viem";
+import { erc20Abi, formatUnits, parseUnits, type Hash } from "viem";
 import { TokenSelect, TokenIcon } from "../token-select";
 import { TOKENS, tokenBySymbol, mockQuote, type RitualToken } from "@/lib/ritual-tokens";
 import { ritualChain } from "@/lib/ritual-chain";
@@ -12,9 +12,7 @@ import { RitualFactory, RitualPair, RitualRouter } from "@/lib/contracts";
 import { useRitualTx } from "@/hooks/use-ritual-tx";
 import {
   applySlippageMin,
-  deadlineFromNow,
   getAmountOut,
-  MAX_UINT256,
   priceImpactBps,
 } from "@/lib/dex/router";
 
@@ -142,20 +140,8 @@ export function SwapCard() {
     chainId: ritualChain.id,
     query: { enabled: !!address && !!fromErc20, refetchInterval: 10_000 },
   });
-  const { data: allowance } = useReadContract({
-    address: fromErc20 ?? undefined,
-    abi: erc20Abi,
-    functionName: "allowance",
-    args: address && router ? [address, router] : undefined,
-    chainId: ritualChain.id,
-    query: { enabled: !!address && !!fromErc20 && !!router, refetchInterval: 10_000 },
-  });
 
   const swapTx = useRitualTx("Swap");
-  const approveTx = useRitualTx("Approve token");
-
-  // Direct pair swap uses transfer() — no approval needed
-  const needApprove = false;
 
   const flip = () => {
     setFrom(to);
@@ -168,27 +154,13 @@ export function SwapCard() {
     }
   };
 
-  async function onApprove() {
-    if (!fromErc20 || !router) return;
-    await approveTx.send(async (wc) =>
-      (wc as unknown as { writeContract: (a: unknown) => Promise<`0x${string}`> }).writeContract({
-        address: fromErc20,
-        abi: erc20Abi,
-        functionName: "approve",
-        args: [router, MAX_UINT256],
-        chain: ritualChain,
-        account: (wc as unknown as { account: `0x${string}` }).account,
-      }),
-    );
-  }
-
-  async function onSwap() {
+  async function onSwap(): Promise<Hash | undefined> {
     if (!isReal || !pair || !realQuote || !fromErc20 || !toErc20) return;
     // Direct pair swap — bypass broken router
-    await swapTx.send(async (wc) => {
+    return swapTx.send(async (wc) => {
       const acct = (wc as unknown as { account: { address: `0x${string}` } }).account;
       // Transfer tokens to pair
-      await (wc as unknown as { writeContract: (a: unknown) => Promise<`0x${string}`> }).writeContract({
+      const transferHash = await (wc as unknown as { writeContract: (a: unknown) => Promise<Hash> }).writeContract({
         address: fromErc20,
         abi: erc20Abi,
         functionName: "transfer",
@@ -199,7 +171,7 @@ export function SwapCard() {
       // Swap from pair
       const t0 = (await pub!.readContract({ address: pair, abi: RitualPair.abi, functionName: "token0" })) as `0x${string}`;
       const inIs0 = fromErc20.toLowerCase() === t0.toLowerCase();
-      await (wc as unknown as { writeContract: (a: unknown) => Promise<`0x${string}`> }).writeContract({
+      const swapHash = await (wc as unknown as { writeContract: (a: unknown) => Promise<Hash> }).writeContract({
         address: pair,
         abi: RitualPair.abi,
         functionName: "swap",
@@ -212,13 +184,19 @@ export function SwapCard() {
         chain: ritualChain,
         account: acct.address,
       });
+      return swapHash;
     });
-    setAmount("");
-    setRefresh((n) => n + 1);
   }
 
-  const busy = swapTx.state.status === "signing" || swapTx.state.status === "pending" ||
-    approveTx.state.status === "signing" || approveTx.state.status === "pending";
+  const busy = swapTx.state.status === "signing" || swapTx.state.status === "pending";
+
+  // Reset amount and refresh after swap confirms
+  useEffect(() => {
+    if (swapTx.state.status === "confirmed") {
+      setAmount("");
+      setRefresh((n) => n + 1);
+    }
+  }, [swapTx.state.status]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -346,27 +324,17 @@ export function SwapCard() {
         </Row>
       </div>
 
-      {needApprove ? (
-        <button
-          onClick={onApprove}
-          disabled={busy}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold bg-signal text-signal-foreground hover:opacity-90 disabled:opacity-60"
-        >
-          <Zap className="size-4" />
-          {busy ? "Approving…" : `Approve ${from.symbol}`}
-        </button>
-      ) : (
-        <button
-          onClick={onSwap}
-          disabled={!num || busy || !address || !isReal}
-          className={cn(
-            "w-full inline-flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold transition",
-            isReal && num && address
-              ? "bg-signal text-signal-foreground hover:opacity-90"
-              : "bg-muted/40 text-muted-foreground cursor-not-allowed",
-            busy && "opacity-60",
-          )}
-        >
+      <button
+        onClick={onSwap}
+        disabled={!num || busy || !address || !isReal}
+        className={cn(
+          "w-full inline-flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold transition",
+          isReal && num && address
+            ? "bg-signal text-signal-foreground hover:opacity-90"
+            : "bg-muted/40 text-muted-foreground cursor-not-allowed",
+          busy && "opacity-60",
+        )}
+      >
           <Zap className="size-4" />
           {!address
             ? "Connect wallet"
@@ -378,7 +346,6 @@ export function SwapCard() {
                   ? "Swap"
                   : "No live pair"}
         </button>
-      )}
 
       <p className="text-[10px] text-muted-foreground flex items-center gap-1 justify-center">
         <Info className="size-3" />
